@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+</head>
+<body>
+ <!-- The core Firebase JS SDK is always required and must be listed first -->
+        <script src="https://www.gstatic.com/firebasejs/8.4.2/firebase-app.js"></script>
+
+        <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-messaging.js"></script>
+        <script>
+            // TODO: Replace firebaseConfig you get from Firebase Console
+            var firebaseConfig = {
+                apiKey: "AIzaSyAMF__fZfJr_n4TQN3fqH_3FMwX6cDkql0",
+                authDomain: "notificationwebportal.firebaseapp.com",
+                projectId: "notificationwebportal",
+                storageBucket: "notificationwebportal.appspot.com",
+                messagingSenderId: "540556220617",
+                appId: "1:540556220617:web:0647a71b177ba2a726d518",
+                measurementId: "G-VFQLHPR6MB"
+            };
+            firebase.initializeApp(firebaseConfig);
+
+            const messaging = firebase.messaging();
+            messaging
+                .requestPermission()
+                .then(function () {
+                    alert( 'Notification permission granted.');
+                    console.log('Notification permission granted.');
+
+                    // get the token in the form of promise
+                    return messaging.getToken();
+                })
+                .then(function (token) {
+                    alert( 'Device token is : <br>' + token);
+                })
+                .catch(function (err) {
+                    alert(err);
+                    console.log('Unable to get permission to notify.', err);
+                });
+
+            let enableForegroundNotification = true;
+            messaging.onMessage(function (payload) {
+                console.log('Message received. ', payload);
+                alert(JSON.stringify(payload));
+
+                if (enableForegroundNotification) {
+                    let notification = payload.notification;
+                    navigator.serviceWorker
+                        .getRegistrations()
+                        .then((registration) => {
+                            registration[0].showNotification(notification.title);
+                        });
+                }
+            });
+        </script>
+        </body>
+</html>
